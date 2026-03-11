@@ -4,14 +4,14 @@
 
 ## 技术栈
 
-| 层 | 选型 |
-|---|---|
-| Web 框架 | [Salvo](https://salvo.rs/) 0.89 |
-| ORM | [Diesel](https://diesel.rs/) 2.1 + PostgreSQL |
-| 认证 | JWT（salvo jwt-auth） |
-| 缓存 | Redis |
-| 邮件 | Lettre + Handlebars 模板 |
-| 异步运行时 | Tokio |
+| 层         | 选型                                          |
+| ---------- | --------------------------------------------- |
+| Web 框架   | [Salvo](https://salvo.rs/) 0.89               |
+| ORM        | [Diesel](https://diesel.rs/) 2.1 + PostgreSQL |
+| 认证       | JWT（salvo jwt-auth）                         |
+| 缓存       | Redis                                         |
+| 邮件       | Lettre + Handlebars 模板                      |
+| 异步运行时 | Tokio                                         |
 
 ---
 
@@ -32,17 +32,17 @@
 cp .env.example .env
 ```
 
-| 变量 | 说明 |
-|---|---|
-| `DATABASE_URL` | PostgreSQL 连接串，如 `postgres://user:pass@localhost/mydb` |
-| `DATABASE_CONNS` | 连接池大小，推荐 `5` |
-| `REDIS_URL` | Redis 连接串，如 `redis://127.0.0.1/` |
-| `SECRET_KEY` | JWT 签名密钥，随机长字符串 |
-| `SUPER_AUTH_TOKEN` | 超管静态 token，用于运维脚本直接访问 |
-| `COOKIE_DOMAIN` | Cookie 域名，如 `example.com` |
-| `SPACE_PATH` | 本地文件存储根目录，如 `/data/space` |
-| `WECHAT_MP_APPID` | 微信小程序 AppID |
-| `WECHAT_MP_SECRET` | 微信小程序 AppSecret |
+| 变量               | 说明                                                        |
+| ------------------ | ----------------------------------------------------------- |
+| `DATABASE_URL`     | PostgreSQL 连接串，如 `postgres://user:pass@localhost/mydb` |
+| `DATABASE_CONNS`   | 连接池大小，推荐 `5`                                        |
+| `REDIS_URL`        | Redis 连接串，如 `redis://127.0.0.1/`                       |
+| `SECRET_KEY`       | JWT 签名密钥，随机长字符串                                  |
+| `SUPER_AUTH_TOKEN` | 超管静态 token，用于运维脚本直接访问                        |
+| `COOKIE_DOMAIN`    | Cookie 域名，如 `example.com`                               |
+| `SPACE_PATH`       | 本地文件存储根目录，如 `/data/space`                        |
+| `WECHAT_MP_APPID`  | 微信小程序 AppID                                            |
+| `WECHAT_MP_SECRET` | 微信小程序 AppSecret                                        |
 
 ### 2. 初始化数据库
 
@@ -89,6 +89,7 @@ cargo run
 ```
 
 **响应示例：**
+
 ```json
 {
   "token": "eyJ...",
@@ -102,6 +103,7 @@ cargo run
 ```
 
 后续所有请求在 Header 中携带 token：
+
 ```
 Authorization: Bearer eyJ...
 ```
@@ -123,6 +125,7 @@ Content-Type: application/json
 ```
 
 **响应：**
+
 ```json
 {
   "token": "eyJ...",
@@ -135,10 +138,10 @@ Content-Type: application/json
 
 **其他鉴权接口：**
 
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| `POST` | `/auth/logout` | 注销当前 token（需认证） |
-| `POST` | `/auth/refresh_token` | 刷新 token（需认证） |
+| 方法   | 路径                  | 说明                     |
+| ------ | --------------------- | ------------------------ |
+| `POST` | `/auth/logout`        | 注销当前 token（需认证） |
+| `POST` | `/auth/refresh_token` | 刷新 token（需认证）     |
 
 ---
 
@@ -189,6 +192,7 @@ Content-Type: application/json
 验签通过后，调用 `things::order::update_user_by_order` 更新订单状态和用户会员信息。该函数已实现月度/年度/永久会员的到期时间计算逻辑，可直接复用。
 
 **订单状态流转：**
+
 ```
 NEW → SUCCESS（支付成功）
     → CLOSED（超时或关闭）
@@ -200,30 +204,30 @@ NEW → SUCCESS（支付成功）
 
 ### 公开路由（无需 token）
 
-| 方法 | 路径 | 说明 |
-|---|---|---|
-| `POST` | `/auth/login` | 账密登录 |
-| `POST` | `/auth/weixin_account_create_and_login` | 微信小程序静默注册 + 登录 |
-| `POST` | `/account/create` | 邮箱注册 |
-| `POST` | `/account/reset_password` | 重置密码 |
-| `POST` | `/account/send_security_code` | 发送安全验证码 |
-| `POST` | `/orders/notify` | 支付回调（供支付服务商调用） |
-| `GET`  | `/users/is_other_taken` | 检查用户名/邮箱是否被占用 |
-| `GET`  | `/health` | 健康检查 |
+| 方法   | 路径                                    | 说明                         |
+| ------ | --------------------------------------- | ---------------------------- |
+| `POST` | `/auth/login`                           | 账密登录                     |
+| `POST` | `/auth/weixin_account_create_and_login` | 微信小程序静默注册 + 登录    |
+| `POST` | `/account/create`                       | 邮箱注册                     |
+| `POST` | `/account/reset_password`               | 重置密码                     |
+| `POST` | `/account/send_security_code`           | 发送安全验证码               |
+| `POST` | `/orders/notify`                        | 支付回调（供支付服务商调用） |
+| `GET`  | `/users/is_other_taken`                 | 检查用户名/邮箱是否被占用    |
+| `GET`  | `/health`                               | 健康检查                     |
 
 ### 需认证路由（需在 Header 携带 `Authorization: Bearer <token>`）
 
-| 资源 | 说明 |
-|---|---|
-| `PATCH /account` | 更新个人资料 |
-| `POST /account/update_password` | 修改密码 |
-| `GET/POST /account/notifications` | 通知列表 / 标记已读 |
-| `GET/POST /orders` | 订单列表 / 创建订单 |
-| `POST /orders/calc_amount` | 预计算金额（含折扣） |
-| `GET /account/help_tickets` | 工单列表 |
-| `GET/POST /users` | 用户列表 / 管理（需 `in_kernel`） |
-| `POST /auth/logout` | 注销 |
-| `POST /auth/refresh_token` | 刷新 token |
+| 资源                              | 说明                              |
+| --------------------------------- | --------------------------------- |
+| `PATCH /account`                  | 更新个人资料                      |
+| `POST /account/update_password`   | 修改密码                          |
+| `GET/POST /account/notifications` | 通知列表 / 标记已读               |
+| `GET/POST /orders`                | 订单列表 / 创建订单               |
+| `POST /orders/calc_amount`        | 预计算金额（含折扣）              |
+| `GET /account/help_tickets`       | 工单列表                          |
+| `GET/POST /users`                 | 用户列表 / 管理（需 `in_kernel`） |
+| `POST /auth/logout`               | 注销                              |
+| `POST /auth/refresh_token`        | 刷新 token                        |
 
 ---
 
@@ -263,7 +267,6 @@ conf/
 - **添加新业务模块**：在 `src/routers/` 新建文件，在 `routers.rs` 的 `root()` 中 `.push()` 挂载
 - **添加新数据表**：`diesel migration generate <name>` 编写 SQL，`diesel migration run`，再运行 `diesel print-schema` 更新 `schema.rs`
 - **权限控制**：在 handler 内用 `current_user!(depot, res)` 获取当前用户，通过 `cuser.in_kernel` 判断是否管理员
-- **实现支付**：参考上方「微信支付接入」章节，填写 `order.rs` 中标注 `TODO` 的两处
 
 ## License
 
