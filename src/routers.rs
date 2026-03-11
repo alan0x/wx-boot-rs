@@ -5,12 +5,9 @@ mod order;
 mod user;
 
 mod help_ticket;
-mod label;
 mod notification;
 mod oauth;
 mod user_last_login;
-
-mod interflow;
 
 use diesel::prelude::*;
 
@@ -114,10 +111,8 @@ pub fn root() -> Router {
                 .push(user::authed_root("users"))
                 .push(notification::authed_root("notifications"))
                 .push(help_ticket::authed_root("help_tickets"))
-                .push(label::authed_root("labels"))
                 .push(user_last_login::authed_root("user_last_logins"))
-                .push(order::authed_root("orders"))
-                .push(interflow::authed_root("interflows")),
+                .push(order::authed_root("orders")),
         )
         .push(Router::with_path("<*path>").get(StaticDir::new("./static")))
 }
