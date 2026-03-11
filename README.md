@@ -6,7 +6,7 @@
 
 | 层 | 选型 |
 |---|---|
-| Web 框架 | [Salvo](https://salvo.rs/) 0.37 |
+| Web 框架 | [Salvo](https://salvo.rs/) 0.89 |
 | ORM | [Diesel](https://diesel.rs/) 2.1 + PostgreSQL |
 | 认证 | JWT（salvo jwt-auth） |
 | 缓存 | Redis |
