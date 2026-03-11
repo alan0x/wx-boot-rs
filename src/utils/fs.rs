@@ -361,6 +361,6 @@ pub async fn send_local_file(
     }
     let file_path = join_path!(crate::space_path(), key.as_ref());
     if Path::new(&file_path).exists() {
-        NamedFile::send_file(file_path, req_headers, res).await;
+        NamedFile::builder(file_path).send(req_headers, res).await;
     }
 }

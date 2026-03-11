@@ -11,7 +11,7 @@ mod user_last_login;
 use diesel::prelude::*;
 
 use salvo::http::StatusCode;
-use salvo::jwt_auth::{CookieFinder, HeaderFinder, JwtAuth, JwtAuthDepotExt, QueryFinder};
+use salvo::jwt_auth::{ConstDecoder, CookieFinder, HeaderFinder, JwtAuth, JwtAuthDepotExt, QueryFinder};
 use salvo::prelude::*;
 use salvo::routing::FlowCtrl;
 use salvo::serve_static::StaticDir;
@@ -22,21 +22,20 @@ use crate::models::*;
 use crate::schema::*;
 use crate::{context, AppResult, JwtClaims};
 
-pub fn new_jwt_auth() -> JwtAuth<JwtClaims> {
-    JwtAuth::new(crate::secret_key())
-        .with_finders(vec![
+pub fn new_jwt_auth() -> JwtAuth<JwtClaims, ConstDecoder> {
+    JwtAuth::new(ConstDecoder::from_secret(crate::secret_key().as_bytes()))
+        .finders(vec![
             Box::new(HeaderFinder::new()),
             Box::new(QueryFinder::new("jwt_token")),
             Box::new(CookieFinder::new("jwt_token")),
         ])
-        .with_response_error(false)
 }
 
 #[handler]
 async fn auth_final(req: &mut Request, depot: &mut Depot, res: &mut Response, ctrl: &mut FlowCtrl) {
     if crate::context::current_user(depot).is_none() {
         ctrl.skip_rest();
-        res.set_status_code(StatusCode::UNAUTHORIZED);
+        res.status_code(StatusCode::UNAUTHORIZED);
     } else {
         ctrl.call_next(req, depot, res).await;
     }
@@ -103,7 +102,7 @@ pub fn root() -> Router {
                 .hoop(auth_final)
                 .push(Router::with_path("user_state").get(home::user_state))
                 .push(Router::with_path("show_logs").get(home::show_logs))
-                .push(Router::with_path(r"show_logs/<*path>").get(home::show_log))
+                .push(Router::with_path(r"show_logs/{**path}").get(home::show_log))
                 .push(auth::authed_root("auth"))
                 .push(account::authed_root("account"))
                 .push(user::authed_root("users"))
@@ -112,5 +111,5 @@ pub fn root() -> Router {
                 .push(user_last_login::authed_root("user_last_logins"))
                 .push(order::authed_root("orders")),
         )
-        .push(Router::with_path("<*path>").get(StaticDir::new("./static")))
+        .push(Router::with_path("{**path}").get(StaticDir::new(["./static"])))
 }

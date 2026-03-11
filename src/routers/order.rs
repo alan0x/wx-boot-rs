@@ -21,7 +21,7 @@ pub fn authed_root(path: impl Into<String>) -> Router {
     Router::with_path(path)
         .get(list)
         .post(create)
-        .push(Router::with_path(r"<id:/\d+/>").get(show))
+        .push(Router::with_path(r"{id:\d+}").get(show))
         .push(Router::with_path("calc_amount").post(calc_amount))
 }
 

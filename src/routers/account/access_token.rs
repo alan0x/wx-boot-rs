@@ -90,8 +90,8 @@ pub async fn create(req: &mut Request, depot: &mut Depot, res: &mut Response) ->
             .filter(access_tokens::name.eq(&pdata.name));
         if diesel_exists!(query, conn) {
             return Err(StatusError::conflict()
-                .with_summary("token conflict")
-                .with_detail("this name is already taken, please try another.")
+                .brief("token conflict")
+                .detail("this name is already taken, please try another.")
                 .into());
         }
         let token = NewAccessToken {
@@ -141,8 +141,8 @@ pub async fn update(req: &mut Request, depot: &mut Depot, res: &mut Response) ->
             .filter(access_tokens::name.eq(&pdata.name));
         if diesel_exists!(query, conn) {
             return Err(StatusError::conflict()
-                .with_summary("token conflict")
-                .with_detail("this name is already taken, please try another.")
+                .brief("token conflict")
+                .detail("this name is already taken, please try another.")
                 .into());
         }
         let token = diesel::update(&exist_token)

@@ -34,12 +34,11 @@ use dotenv::dotenv;
 use flexi_logger::{FileSpec, Logger};
 use salvo::prelude::*;
 use serde::{Deserialize, Serialize};
-use tracing_futures::Instrument;
 
 pub use error::Error;
 pub use shared::*;
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct JwtClaims {
     user: i64,
     exp: i64,
@@ -101,10 +100,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let addr = format!("0.0.0.0:{}", port);
     println!("Server listening on {}", addr);
 
-    Server::new(TcpListener::bind(&addr))
-        .serve(routers::root())
-        .instrument(tracing::info_span!("server.serve"))
-        .await;
+    let acceptor = TcpListener::new(addr).bind().await;
+    Server::new(acceptor).serve(routers::root()).await;
 
     Ok(())
 }

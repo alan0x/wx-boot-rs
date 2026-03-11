@@ -429,8 +429,8 @@ macro_rules! check_ident_name_preserved {
     ($name:expr) => {
         if $crate::is_ident_name_preserved($name) {
             return Err(salvo::http::StatusError::conflict()
-                .with_summary("name preserved")
-                .with_detail("this name is preserved")
+                .brief("name preserved")
+                .detail("this name is preserved")
                 .into());
         }
     };
@@ -442,14 +442,14 @@ macro_rules! check_ident_name_other_taken {
         match $crate::utils::validator::is_ident_name_other_taken($user_id, $ident_name, $conn) {
             Ok(true) => {
                 return Err(salvo::http::StatusError::conflict()
-                    .with_summary("username conflict")
-                    .with_detail("this user name is already taken, please try another.")
+                    .brief("username conflict")
+                    .detail("this user name is already taken, please try another.")
                     .into())
             }
             Err(_) => {
                 return Err(salvo::http::StatusError::internal_server_error()
-                    .with_summary("db error")
-                    .with_detail("db error when check username conflict")
+                    .brief("db error")
+                    .detail("db error when check username conflict")
                     .into())
             }
             _ => {}
@@ -462,14 +462,14 @@ macro_rules! check_email_other_taken {
         match $crate::utils::validator::is_email_other_taken($user_id, $email, $conn) {
             Ok(true) => {
                 return Err(salvo::http::StatusError::conflict()
-                    .with_summary("email conflict")
-                    .with_detail("This email is already taken, please try another.")
+                    .brief("email conflict")
+                    .detail("This email is already taken, please try another.")
                     .into())
             }
             Err(_) => {
                 return Err(salvo::http::StatusError::internal_server_error()
-                    .with_summary("db error")
-                    .with_detail("db error when check email conflict")
+                    .brief("db error")
+                    .detail("db error when check email conflict")
                     .into())
             }
             _ => {}

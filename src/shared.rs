@@ -249,18 +249,16 @@ pub fn safe_url_path(raw: &str) -> String {
 }
 
 pub fn bad_request_error(summary: String, detail: Option<String>) -> StatusError {
-    StatusError {
-        code: StatusCode::BAD_REQUEST,
-        name: "Bad Request".into(),
-        detail,
-        summary: Some(summary),
+    let mut err = StatusError::bad_request().brief(summary);
+    if let Some(d) = detail {
+        err = err.detail(d);
     }
+    err
 }
 pub fn server_internal_error(summary: String, detail: Option<String>) -> StatusError {
-    StatusError {
-        code: StatusCode::INTERNAL_SERVER_ERROR,
-        name: "Server Internal Error".into(),
-        detail,
-        summary: Some(summary),
+    let mut err = StatusError::internal_server_error().brief(summary);
+    if let Some(d) = detail {
+        err = err.detail(d);
     }
+    err
 }

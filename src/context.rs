@@ -6,7 +6,7 @@ use crate::{AppResult, ErrorWrap, StatusWrap};
 
 #[inline]
 pub fn current_user(depot: &Depot) -> Option<&User> {
-    depot.get::<User>("current_user")
+    depot.get::<User>("current_user").ok()
 }
 
 #[inline]
@@ -17,7 +17,7 @@ pub fn render_status_json<N: Into<String>, S: Into<String>, D: Into<String>>(
     summary: S,
     detail: D,
 ) -> AppResult<()> {
-    res.set_status_code(http_code);
+    res.status_code(http_code);
     if http_code.is_client_error() || http_code.is_server_error() {
         res.render(Json(ErrorWrap::new(http_code, name, summary, detail)));
     } else {

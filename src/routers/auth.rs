@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, Utc};
-use cookie::Expiration;
+use salvo::http::cookie::Expiration;
 use diesel::prelude::*;
 use rand::distributions::Alphanumeric;
 use rand::Rng;
@@ -168,14 +168,14 @@ pub fn insert_token_to_db(
         .execute(conn)
 }
 pub fn create_token_cookie(jwt_token: String) -> Cookie<'static> {
-    let expires = cookie::time::OffsetDateTime::now_utc() + cookie::time::Duration::days(7);
-    Cookie::build("jwt_token", jwt_token)
+    let expires = salvo::http::cookie::time::OffsetDateTime::now_utc() + salvo::http::cookie::time::Duration::days(7);
+    Cookie::build(("jwt_token", jwt_token))
         .path("/")
         .domain(crate::cookie_domain())
         .secure(true)
         .http_only(false)
         .expires(Expiration::from(expires))
-        .finish()
+        .build()
 }
 
 #[handler]
@@ -266,8 +266,8 @@ pub async fn weixin_account_create_and_login(
     let resp = client.get(url.as_str()).send().await?;
     if !resp.status().is_success() {
         return Err(StatusError::failed_dependency()
-            .with_summary("wechat jscode2session not response")
-            .with_detail("wechat jscode2session not response")
+            .brief("wechat jscode2session not response")
+            .detail("wechat jscode2session not response")
             .into());
     }
     let resp_text = resp.text().await?;
@@ -275,8 +275,8 @@ pub async fn weixin_account_create_and_login(
     if let Some(errcode) = resp_data.errcode {
         if errcode != 0 {
             return Err(StatusError::bad_request()
-                .with_summary("wechat jscode2session error")
-                .with_detail(resp_data.errmsg.unwrap_or_default())
+                .brief("wechat jscode2session error")
+                .detail(resp_data.errmsg.unwrap_or_default())
                 .into());
         }
     }

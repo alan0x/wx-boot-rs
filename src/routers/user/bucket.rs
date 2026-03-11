@@ -39,7 +39,7 @@ pub async fn upload(req: &mut Request, depot: &mut Depot, res: &mut Response) ->
 }
 #[handler]
 pub async fn serve_file(req: &mut Request, depot: &mut Depot, res: &mut Response) -> AppResult<()> {
-    let rest_path = crate::safe_url_path(&req.param::<String>("*path").unwrap_or_default());
+    let rest_path = crate::safe_url_path(&req.param::<String>("path").unwrap_or_default());
     println!("rest_path: {}", rest_path);
     if rest_path.is_empty() {
         return context::render_not_found_json(res);

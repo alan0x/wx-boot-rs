@@ -11,7 +11,7 @@ use crate::{context, AppResult};
 
 pub fn authed_root(path: impl Into<String>) -> Router {
     Router::with_path(path).get(list).post(create).push(
-        Router::with_path(r"<id:/\d+/>")
+        Router::with_path(r"{id:\d+}")
             .get(show)
             .patch(update)
             .delete(delete),

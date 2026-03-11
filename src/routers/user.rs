@@ -19,21 +19,21 @@ pub fn authed_root(path: impl Into<String>) -> Router {
         .get(list)
         .delete(bulk_delete)
         .push(
-            Router::with_path(r"<id:/\d+/>")
+            Router::with_path(r"{id:\d+}")
                 .get(show)
                 .patch(update)
                 .put(update)
                 .delete(delete)
-                .push(Router::with_path(r"avatars/<path>").get(avatar::show))
+                .push(Router::with_path(r"avatars/{path}").get(avatar::show))
                 .push(Router::with_path("set_disabled").post(set_disabled))
                 .push(Router::with_path("emails").get(list_emails))
                 .push(Router::with_path("buckets").post(bucket::upload))
-                .push(Router::with_path(r"buckets/<*path>").get(bucket::serve_file)),
+                .push(Router::with_path(r"buckets/{**path}").get(bucket::serve_file)),
         )
 }
 
 pub fn public_root(path: impl Into<String>) -> Router {
-    Router::with_path(path).push(Router::with_path("is_other_taken").handle(is_other_taken))
+    Router::with_path(path).push(Router::with_path("is_other_taken").goal(is_other_taken))
 }
 
 #[handler]

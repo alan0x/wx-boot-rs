@@ -56,7 +56,7 @@ impl Writer for Error {
             Error::HttpStatus(e) => e.code,
             _ => StatusCode::INTERNAL_SERVER_ERROR,
         };
-        res.set_status_code(code);
+        res.status_code(code);
         let cuser = crate::context::current_user(depot);
         if let Some(cuser) = &cuser {
             tracing::error!(error = &*self.to_string(), user_id = ?cuser.id, user_name = %cuser.ident_name, "error happened");
@@ -116,7 +116,7 @@ impl Writer for Error {
             Error::Diesel(e) => {
                 tracing::error!(error = ?e, "diesel db error");
                 let info = if let diesel::result::Error::NotFound = e {
-                    res.set_status_code(StatusCode::NOT_FOUND);
+                    res.status_code(StatusCode::NOT_FOUND);
                     StatusInfo {
                         code: StatusCode::NOT_FOUND.as_u16(),
                         name: "NOT_FOUND".into(),
@@ -136,18 +136,12 @@ impl Writer for Error {
                 ErrorWrap { error: info }
             }
             Error::HttpStatus(e) => {
-                let StatusError {
-                    code,
-                    name,
-                    summary,
-                    detail,
-                } = e;
                 ErrorWrap {
                     error: StatusInfo {
-                        code: code.as_u16(),
-                        name,
-                        summary: summary.unwrap_or_else(|| "INTERNAL_SERVER_ERROR".into()),
-                        detail,
+                        code: e.code.as_u16(),
+                        name: e.name,
+                        summary: e.brief,
+                        detail: e.detail,
                         details: None,
                     },
                 }

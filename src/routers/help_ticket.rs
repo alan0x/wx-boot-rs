@@ -16,9 +16,9 @@ pub fn authed_root(path: impl Into<String>) -> Router {
         .get(list)
         .post(create)
         .push(Router::with_path("buckets").post(upload))
-        .push(Router::with_path(r"buckets/<*path>").get(serve_file))
+        .push(Router::with_path(r"buckets/{**path}").get(serve_file))
         .push(
-            Router::with_path(r"<id:/\d+/>")
+            Router::with_path(r"{id:\d+}")
                 .get(show)
                 .patch(update)
                 .put(update)
@@ -58,7 +58,7 @@ pub async fn serve_file(
     _depot: &mut Depot,
     res: &mut Response,
 ) -> AppResult<()> {
-    let rest_path = crate::safe_url_path(&req.param::<String>("*path").unwrap_or_default());
+    let rest_path = crate::safe_url_path(&req.param::<String>("path").unwrap_or_default());
     if rest_path.is_empty() {
         return context::render_not_found_json(res);
     }

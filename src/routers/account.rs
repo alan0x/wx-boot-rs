@@ -26,7 +26,7 @@ pub fn authed_root(path: impl Into<String>) -> Router {
     Router::with_path(path)
         .patch(update)
         .put(update)
-        .push(Router::with_path(r#"avatars/<width:/\d+/>x<height:/\d+/>.<ext>"#).get(avatar::show))
+        .push(Router::with_path(r#"avatars/{width:\d+}x{height:\d+}.{ext}"#).get(avatar::show))
         .push(
             Router::with_path("avatars/upload")
                 .post(avatar::upload)
@@ -46,7 +46,7 @@ pub fn authed_root(path: impl Into<String>) -> Router {
             Router::with_path("access_tokens")
                 .get(access_token::list)
                 .push(
-                    Router::with_path(r"<id:/\d+/>")
+                    Router::with_path(r"{id:\d+}")
                         .patch(access_token::update)
                         .delete(access_token::delete),
                 ),
@@ -58,7 +58,7 @@ pub fn authed_root(path: impl Into<String>) -> Router {
                 .push(Router::with_path("mark_all_read").post(notification::mark_all_read))
                 .push(Router::with_path("mark_read").post(notification::mark_read))
                 .push(
-                    Router::with_path(r"<id:/\d+/>")
+                    Router::with_path(r"{id:\d+}")
                         .get(notification::show)
                         .delete(notification::delete),
                 ),
@@ -67,7 +67,7 @@ pub fn authed_root(path: impl Into<String>) -> Router {
         .push(
             Router::with_path("help_tickets")
                 .get(help_ticket::list)
-                .push(Router::with_path(r"<id:/\d+/>").get(help_ticket::show)),
+                .push(Router::with_path(r"{id:\d+}").get(help_ticket::show)),
         )
         .push(Router::with_path("orders").get(order::list))
         .push(Router::with_path("state").post(state::online))
@@ -820,8 +820,8 @@ pub async fn weixin_account_create_and_login(
     let resp = client.get(url.as_str()).send().await?;
     if !resp.status().is_success() {
         return Err(StatusError::failed_dependency()
-            .with_summary("wechat jscode2session not response")
-            .with_detail("wechat jscode2session not response")
+            .brief("wechat jscode2session not response")
+            .detail("wechat jscode2session not response")
             .into());
     }
     let resp_str = resp.text().await?;
@@ -852,7 +852,7 @@ pub async fn weixin_account_create_and_login(
             }));
         } else {
             return Err(StatusError::internal_server_error()
-                .with_detail("jwt token create failed")
+                .detail("jwt token create failed")
                 .into());
         };
     } else {
@@ -897,7 +897,7 @@ pub async fn weixin_account_create_and_login(
             }));
         } else {
             return Err(StatusError::internal_server_error()
-                .with_detail("jwt token create failed")
+                .detail("jwt token create failed")
                 .into());
         };
     }

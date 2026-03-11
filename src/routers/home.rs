@@ -57,7 +57,7 @@ pub async fn show_log(req: &mut Request, depot: &mut Depot, res: &mut Response) 
     if !cuser.in_kernel {
         return context::render_access_denied_json(res);
     }
-    let rest_path = crate::safe_url_path(&req.param::<String>("*path").unwrap_or_default());
+    let rest_path = crate::safe_url_path(&req.param::<String>("path").unwrap_or_default());
     let log_dir = std::env::var("LOG_LOCATION").unwrap_or(String::from("/data/log_files"));
     let file_path = format!("{}/{}", log_dir, rest_path);
     match std::fs::read_to_string(&file_path) {
