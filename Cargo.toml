@@ -45,3 +45,4 @@ time = "0.3.36"
 flexi_logger = "0.29.3"
 log = "0.4"
 lazy_static = "1.5.0"
+wechat-pay-rust-sdk = {git = "https://github.com/FPG-Alan/wechat-pay-rust-sdk.git", rev = "beaaf6f"}
