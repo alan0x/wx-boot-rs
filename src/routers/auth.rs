@@ -1,6 +1,8 @@
 use chrono::{DateTime, Duration, Utc};
 use cookie::Expiration;
 use diesel::prelude::*;
+use rand::distributions::Alphanumeric;
+use rand::Rng;
 use salvo::http::cookie::Cookie;
 use salvo::http::StatusCode;
 use salvo::prelude::*;
@@ -10,10 +12,15 @@ use crate::db::{self, lower};
 use crate::models::*;
 use crate::schema::*;
 use crate::utils::{password, validator};
-use crate::{context, AppResult, StatusInfo};
+use crate::{context, utils, AppResult, StatusInfo};
 
 pub fn public_root(path: impl Into<String>) -> Router {
-    Router::with_path(path).push(Router::with_path("login").post(login))
+    Router::with_path(path)
+        .push(Router::with_path("login").post(login))
+        .push(
+            Router::with_path("weixin_account_create_and_login")
+                .post(weixin_account_create_and_login),
+        )
 }
 pub fn authed_root(path: impl Into<String>) -> Router {
     Router::with_path(path)
@@ -215,6 +222,113 @@ pub fn create_and_send_token(
             }
             res.add_cookie(create_token_cookie(jwt_token.clone()));
             res.render(Json(ResultData { token: &jwt_token }));
+            Ok(())
+        }
+        Err(msg) => context::render_internal_server_error_json_with_detail(res, msg),
+    }
+}
+
+#[handler]
+pub async fn weixin_account_create_and_login(
+    req: &mut Request,
+    _depot: &mut Depot,
+    res: &mut Response,
+) -> AppResult<()> {
+    #[derive(Deserialize, Debug)]
+    struct PostedData {
+        code: String,
+    }
+    #[derive(Deserialize, Debug)]
+    struct JsCode2SessionResponse {
+        openid: String,
+        session_key: String,
+        unionid: Option<String>,
+        errcode: Option<i64>,
+        errmsg: Option<String>,
+    }
+    #[derive(Serialize, Debug)]
+    struct ResultData {
+        token: Option<String>,
+        user: User,
+    }
+
+    let pdata = parse_posted_data!(req, res, PostedData);
+
+    // 用小程序 code 换取 openid
+    let client = reqwest::Client::new();
+    let mut url = reqwest::Url::parse("https://api.weixin.qq.com/sns/jscode2session")?;
+    url.query_pairs_mut()
+        .append_pair("appid", &crate::wechat_mp_appid())
+        .append_pair("secret", &crate::wechat_mp_secret())
+        .append_pair("grant_type", "authorization_code")
+        .append_pair("js_code", &pdata.code);
+
+    let resp = client.get(url.as_str()).send().await?;
+    if !resp.status().is_success() {
+        return Err(StatusError::failed_dependency()
+            .with_summary("wechat jscode2session not response")
+            .with_detail("wechat jscode2session not response")
+            .into());
+    }
+    let resp_text = resp.text().await?;
+    let resp_data = serde_json::from_str::<JsCode2SessionResponse>(&resp_text)?;
+    if let Some(errcode) = resp_data.errcode {
+        if errcode != 0 {
+            return Err(StatusError::bad_request()
+                .with_summary("wechat jscode2session error")
+                .with_detail(resp_data.errmsg.unwrap_or_default())
+                .into());
+        }
+    }
+
+    let mut conn = db::connect()?;
+
+    // 查找已有用户
+    let exist_user = users::table
+        .filter(users::weixin_openid.eq(&resp_data.openid))
+        .first::<User>(&mut conn)
+        .ok();
+
+    let user = if let Some(u) = exist_user {
+        u
+    } else {
+        // 静默注册
+        let random_suffix: String = rand::thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(4)
+            .map(char::from)
+            .collect();
+        let new_user = NewUser {
+            ident_name: &utils::uuid_string(),
+            display_name: &format!("微信用户-{}", random_suffix),
+            password: &resp_data.openid,
+            in_kernel: false,
+            is_verified: false,
+            weixin_openid: Some(&resp_data.openid),
+            profile: serde_json::json!(null),
+            contribute: Some(0),
+            enable_ranking: Some(true),
+            updated_by: None,
+            created_by: None,
+        };
+        diesel::insert_into(users::table)
+            .values(&new_user)
+            .get_result::<User>(&mut conn)?
+    };
+
+    match create_token(&user, &mut conn) {
+        Ok(jwt_token) => {
+            log::info!(
+                "weixin login: {}({}) IP: {:?}",
+                user.display_name,
+                user.id,
+                req.remote_addr()
+            );
+            res.add_cookie(create_token_cookie(jwt_token.clone()));
+            res.render(Json(ResultData {
+                token: Some(jwt_token),
+                user,
+            }));
             Ok(())
         }
         Err(msg) => context::render_internal_server_error_json_with_detail(res, msg),

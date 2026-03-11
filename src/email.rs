@@ -8,10 +8,6 @@ static HANDLEBARS: Lazy<Handlebars<'static>> = Lazy::new(|| {
     let mut reg = Handlebars::new();
     reg.register_template_file("layout", "conf/emails/layout.hbs")
         .unwrap();
-    reg.register_template_file("security_code", "conf/emails/security_code.hbs")
-        .unwrap();
-    reg.register_template_file("verification", "conf/emails/verification.hbs")
-        .unwrap();
     crate::helpers::handlebars::register_common_helpers(&mut reg);
     reg
 });

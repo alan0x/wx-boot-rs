@@ -6,7 +6,6 @@ mod user;
 
 mod help_ticket;
 mod notification;
-mod oauth;
 mod user_last_login;
 
 use diesel::prelude::*;
@@ -97,7 +96,6 @@ pub fn root() -> Router {
         .push(account::public_root("account"))
         .push(user::public_root("users"))
         .push(order::public_root("orders"))
-        .push(oauth::public_root("oauth"))
         .push(
             Router::new()
                 .hoop(new_jwt_auth())
