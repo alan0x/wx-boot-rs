@@ -241,8 +241,6 @@ pub async fn weixin_account_create_and_login(
     #[derive(Deserialize, Debug)]
     struct JsCode2SessionResponse {
         openid: String,
-        session_key: String,
-        unionid: Option<String>,
         errcode: Option<i64>,
         errmsg: Option<String>,
     }

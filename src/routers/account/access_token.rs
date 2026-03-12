@@ -11,7 +11,7 @@ use crate::utils::validator;
 use crate::{context, AppResult};
 
 #[handler]
-pub async fn delete(req: &mut Request, depot: &mut Depot, res: &mut Response) -> AppResult<()> {
+pub async fn delete(req: &mut Request, _depot: &mut Depot, res: &mut Response) -> AppResult<()> {
     let mut conn = db::connect()?;
     delete_record!(
         req,
@@ -29,7 +29,7 @@ pub async fn delete(req: &mut Request, depot: &mut Depot, res: &mut Response) ->
     Ok(())
 }
 #[handler]
-pub async fn bulk_delete(req: &mut Request, depot: &mut Depot, res: &mut Response) -> AppResult<()> {
+pub async fn bulk_delete(req: &mut Request, _depot: &mut Depot, res: &mut Response) -> AppResult<()> {
     let mut conn = db::connect()?;
     bulk_delete_records!(
         req,
@@ -117,12 +117,8 @@ pub async fn create(req: &mut Request, depot: &mut Depot, res: &mut Response) ->
 pub async fn update(req: &mut Request, depot: &mut Depot, res: &mut Response) -> AppResult<()> {
     #[derive(Deserialize, Debug)]
     struct PostedData {
-        user_id: i64,
         #[serde(default)]
         name: String,
-        #[serde(default)]
-        value: String,
-        device: Option<String>,
     }
     let pdata = parse_posted_data!(req, res, PostedData);
     let cuser = current_user!(depot, res);

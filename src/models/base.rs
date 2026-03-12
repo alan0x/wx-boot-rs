@@ -262,10 +262,3 @@ pub struct NewNotification<'a> {
     pub created_by: Option<i64>,
 }
 
-
-#[derive(QueryableByName, Debug)]
-pub struct TableId {
-    #[diesel(sql_type = ::diesel::sql_types::BigInt)]
-    #[diesel(column_name = id)]
-    pub id: i64,
-}

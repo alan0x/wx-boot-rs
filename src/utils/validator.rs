@@ -92,20 +92,6 @@ pub fn validate_generic_name<T: AsRef<str>>(name: T) -> Result<(), String> {
     Ok(())
 }
 
-pub fn validate_custom_label_name<T: AsRef<str>>(name: T) -> Result<(), String> {
-    let name = name.as_ref().trim();
-    if name.is_empty() {
-        return Err("name is empty".into());
-    }
-    if name.chars().count() > 4 {
-        return Err("name is too long".into());
-    }
-    static RE: Lazy<Regex> = Lazy::new(|| Regex::new(r"^[\p{Han}]{1,4}$").unwrap());
-    if !RE.is_match(name) {
-        return Err("name format is invalid".into());
-    }
-    Ok(())
-}
 
 pub fn is_email_other_taken(
     user_id: Option<i64>,

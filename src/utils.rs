@@ -3,7 +3,6 @@ pub mod media;
 pub mod password;
 pub mod validator;
 
-use regex::Regex;
 use std::borrow::Cow;
 use std::fmt::Write;
 use std::fs::File;
@@ -16,11 +15,6 @@ use salvo::http::{HeaderValue, Request, Response};
 use uuid::Uuid;
 
 use crate::{AppResult, Error};
-
-pub fn clean_string(s: &str) -> String {
-    let re = Regex::new(r"[^\p{L}\p{N}]").unwrap();
-    re.replace_all(s, "").to_string()
-}
 
 pub fn hash_file_md5(path: impl AsRef<Path>) -> Result<String, std::io::Error> {
     let mut file = File::open(path.as_ref())?;

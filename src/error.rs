@@ -1,6 +1,6 @@
 use crate::{ErrorWrap, StatusInfo};
 use async_trait::async_trait;
-use salvo::http::{StatusCode, StatusError};
+use salvo::http::{StatusCode};
 use salvo::prelude::{Depot, Json, Request, Response, Writer};
 use std::borrow::Cow;
 use std::io;

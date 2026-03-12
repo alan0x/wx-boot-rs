@@ -1,9 +1,7 @@
 use bigdecimal::BigDecimal;
 use chrono::{DateTime, Utc};
-use diesel::sql_types::Jsonb;
 use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 
 use crate::db::url_filter::JoinedOption;
 use crate::schema::*;

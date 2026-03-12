@@ -26,12 +26,7 @@ pub fn authed_root(path: impl Into<String>) -> Router {
         )
 }
 #[handler]
-pub async fn upload(req: &mut Request, depot: &mut Depot, res: &mut Response) -> AppResult<()> {
-    // let cuser = current_user!(depot, res);
-    // if !cuser.in_kernel {
-    //     return context::render_access_denied_json(res);
-    // }
-    // drop(conn);
+pub async fn upload(req: &mut Request, _depot: &mut Depot, res: &mut Response) -> AppResult<()> {
 
     let unique = utils::str_to_bool(
         &req.query::<String>("unique")
@@ -187,51 +182,7 @@ pub async fn create(req: &mut Request, depot: &mut Depot, res: &mut Response) ->
     Ok(())
 }
 
-mod test_dingtalk_boot {
-    use super::*;
-    #[tokio::test]
-    async fn test_dingtalk_boot() {
-        // 向钉钉机器人发送post请求
-        let client = Client::new();
-        let key_word = "运维事件";
-        let payload = DingTalkBootPayload {
-            msg_type: String::from("link"),
-            link: DingTalkBootLinkContent {
-                title: format!("[{}]: {} 提交工单", key_word, "yy"),
-                text: format!("{}, {}", "书籍缺失", "9787544796057"),
-                message_url: format!("https://pitun.cc/admin/help_tickets"),
-            },
-        };
-        let res = client.post("https://oapi.dingtalk.com/robot/send?access_token=5ad8a5746b6812082f359ff9c06c339567bd11a3e6a137eeb15651a67c2fa62c").body(serde_json::to_string(&payload).unwrap()).header("Content-Type", "application/json");
-        println!("res: {:?}", res);
-        let res = res.send().await;
-        println!("res: {:?}", res);
-        assert_eq!(1, 1);
-    }
-}
 
-mod test_dingtalk_boot2 {
-    use super::*;
-    #[tokio::test]
-    async fn test_dingtalk_boot() {
-        // 向钉钉机器人发送post请求
-        let client = Client::new();
-        let key_word = "运维事件";
-        let payload = DingTalkBootPayload {
-            msg_type: String::from("link"),
-            link: DingTalkBootLinkContent {
-                title: format!("[{}]: 豆瓣爬虫故障", key_word),
-                text: format!("请更新cookie",),
-                message_url: format!("https://pitun.cc/admin/"),
-            },
-        };
-        let res = client.post("https://oapi.dingtalk.com/robot/send?access_token=5ad8a5746b6812082f359ff9c06c339567bd11a3e6a137eeb15651a67c2fa62c").body(serde_json::to_string(&payload).unwrap()).header("Content-Type", "application/json");
-        println!("res: {:?}", res);
-        let res = res.send().await;
-        println!("res: {:?}", res);
-        assert_eq!(1, 1);
-    }
-}
 
 #[handler]
 pub async fn update(req: &mut Request, depot: &mut Depot, res: &mut Response) -> AppResult<()> {

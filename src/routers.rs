@@ -20,7 +20,7 @@ use salvo::size_limiter;
 use crate::db;
 use crate::models::*;
 use crate::schema::*;
-use crate::{context, AppResult, JwtClaims};
+use crate::{AppResult, JwtClaims};
 
 pub fn new_jwt_auth() -> JwtAuth<JwtClaims, ConstDecoder> {
     JwtAuth::new(ConstDecoder::from_secret(crate::secret_key().as_bytes()))

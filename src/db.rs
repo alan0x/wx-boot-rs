@@ -90,11 +90,6 @@ impl ValidGrouping<()> for OrQueryFragments {
     type IsAggregate = is_aggregate::Never;
 }
 
-impl OrQueryFragments {
-    pub fn is_empty(&self) -> bool {
-        self.0.is_empty()
-    }
-}
 impl QueryFragment<Pg> for OrQueryFragments {
     fn walk_ast<'b>(&'b self, mut out: AstPass<'_, 'b, Pg>) -> QueryResult<()> {
         out.unsafe_to_cache_prepared();

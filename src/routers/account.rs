@@ -1,8 +1,7 @@
-use bigdecimal::BigDecimal;
 use chrono::{Duration, Utc};
 use diesel::prelude::*;
 use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
+use rand::{Rng};
 use salvo::http::StatusCode;
 use salvo::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -527,7 +526,7 @@ pub async fn resend_verification_email(
 }
 
 #[handler]
-pub async fn affair(req: &mut Request, depot: &mut Depot, res: &mut Response) -> AppResult<()> {
+pub async fn affair(_req: &mut Request, depot: &mut Depot, res: &mut Response) -> AppResult<()> {
     let cuser = current_user!(depot, res);
     #[derive(Serialize, Debug)]
     struct ResultData {
@@ -754,11 +753,7 @@ pub async fn weixin_account_create_and_login(
 ) -> AppResult<()> {
     #[derive(Deserialize, Debug)]
     struct WeiXinResponse {
-        openid: String,
-        session_key: String,
-        unionid: Option<String>,
-        errcode: Option<i64>,
-        errmsg: Option<String>,
+        openid: String
     }
 
     #[derive(Deserialize, Debug)]
