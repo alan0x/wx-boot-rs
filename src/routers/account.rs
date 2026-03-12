@@ -532,8 +532,6 @@ pub async fn affair(req: &mut Request, depot: &mut Depot, res: &mut Response) ->
     #[derive(Serialize, Debug)]
     struct ResultData {
         notifiction_nums: i64,
-        unresolved_unhandled_count: i64,
-        resolved_unhandled_count: i64,
     }
 
     let mut conn = db::connect()?;
@@ -546,48 +544,8 @@ pub async fn affair(req: &mut Request, depot: &mut Depot, res: &mut Response) ->
         .select(diesel::dsl::count_star())
         .first::<i64>(&mut conn)?;
 
-    let unresolved_unhandled_count = interflow_threads::table
-        .inner_join(
-            interflow_streams::table.on(interflow_threads::stream_id.eq(interflow_streams::id)),
-        )
-        .inner_join(
-            help_tickets::table.on(interflow_streams::relied_entity
-                .eq("help_ticket")
-                .and(interflow_streams::relied_id.eq(help_tickets::id.nullable()))),
-        )
-        .filter(
-            help_tickets::created_by
-                .eq(cuser.id)
-                .and(help_tickets::is_resolved.eq(false))
-                .and(interflow_threads::is_handled.eq(false))
-                .and(interflow_threads::is_recalled.eq(false)),
-        )
-        .select(diesel::dsl::count_star())
-        .first::<i64>(&mut conn)?;
-
-    let resolved_unhandled_count = interflow_threads::table
-        .inner_join(
-            interflow_streams::table.on(interflow_threads::stream_id.eq(interflow_streams::id)),
-        )
-        .inner_join(
-            help_tickets::table.on(interflow_streams::relied_entity
-                .eq("help_ticket")
-                .and(interflow_streams::relied_id.eq(help_tickets::id.nullable()))),
-        )
-        .filter(
-            help_tickets::created_by
-                .eq(cuser.id)
-                .and(help_tickets::is_resolved.eq(true))
-                .and(interflow_threads::is_handled.eq(false))
-                .and(interflow_threads::is_recalled.eq(false)),
-        )
-        .select(diesel::dsl::count_star())
-        .first::<i64>(&mut conn)?;
-
     res.render(Json(ResultData {
         notifiction_nums,
-        unresolved_unhandled_count,
-        resolved_unhandled_count,
     }));
     Ok(())
 }

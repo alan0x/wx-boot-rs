@@ -80,15 +80,6 @@ pub fn is_ident_name_preserved(name: &str) -> bool {
     PRESERVED_IDENT_NAMES.contains(&name)
 }
 
-pub fn uncategorized_label_id(conn: &mut PgConnection) -> AppResult<i64> {
-    let id = labels::table
-        .filter(labels::owner_id.eq(SYSTEM_LABEL_OWNER_ID))
-        .filter(labels::name.eq(UNCLASSIFIED_LABEL_NAME))
-        .select(labels::id)
-        .first::<i64>(conn)?;
-    Ok(id)
-}
-
 #[derive(Serialize, Debug)]
 pub struct StatusInfo {
     pub code: u16,

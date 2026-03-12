@@ -262,35 +262,6 @@ pub struct NewNotification<'a> {
     pub created_by: Option<i64>,
 }
 
-pub static LABEL_FILTER_FIELDS: Lazy<Vec<String>> = Lazy::new(|| {
-    vec!["id", "owner_id", "name", "updated_by", "created_by"]
-        .into_iter()
-        .map(String::from)
-        .collect()
-});
-pub static LABEL_JOINED_OPTIONS: Lazy<Vec<JoinedOption>> = Lazy::new(Vec::new);
-#[derive(Identifiable, Queryable, Serialize, Clone, Debug)]
-#[diesel(table_name = labels)]
-pub struct Label {
-    pub id: i64,
-    pub owner_id: i64,
-    pub name: String,
-
-    pub updated_by: Option<i64>,
-    pub updated_at: DateTime<Utc>,
-    pub created_by: Option<i64>,
-    pub created_at: DateTime<Utc>,
-}
-
-#[derive(Insertable, Deserialize, Clone, Debug)]
-#[diesel(table_name = labels)]
-pub struct NewLabel<'a> {
-    pub owner_id: i64,
-    pub name: &'a str,
-
-    pub updated_by: Option<i64>,
-    pub created_by: Option<i64>,
-}
 
 #[derive(QueryableByName, Debug)]
 pub struct TableId {
