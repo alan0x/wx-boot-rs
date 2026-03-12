@@ -83,19 +83,6 @@ CREATE TABLE IF NOT EXISTS public.notifications (
     created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Labels
-CREATE TABLE IF NOT EXISTS public.labels (
-    id bigserial PRIMARY KEY NOT NULL,
-    owner_id bigint NOT NULL,
-    name character varying(50) NOT NULL,
-    updated_by bigint,
-    updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by bigint,
-    created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- Insert default label
-INSERT INTO labels (owner_id, name) VALUES (1, '未分类') ON CONFLICT DO NOTHING;
 
 -- Help Tickets
 CREATE TABLE IF NOT EXISTS public.help_tickets (
@@ -138,73 +125,4 @@ CREATE TABLE IF NOT EXISTS public.user_last_login (
     id bigserial PRIMARY KEY NOT NULL,
     user_id bigint NOT NULL,
     last_login timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- Interflow Streams
-CREATE TABLE IF NOT EXISTS public.interflow_streams (
-    id bigserial PRIMARY KEY NOT NULL,
-    owner_id bigint NOT NULL,
-    kind text NOT NULL DEFAULT '',
-    parent_id bigint,
-    relied_entity text,
-    relied_id bigint,
-    subject text NOT NULL DEFAULT '',
-    is_recalled boolean NOT NULL DEFAULT false,
-    is_rejected boolean NOT NULL DEFAULT false,
-    is_handled boolean NOT NULL DEFAULT false,
-    is_resolved boolean NOT NULL DEFAULT false,
-    extra jsonb,
-    description text,
-    updated_by bigint,
-    updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by bigint,
-    created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- Interflow Threads
-CREATE TABLE IF NOT EXISTS public.interflow_threads (
-    id bigserial PRIMARY KEY NOT NULL,
-    owner_id bigint NOT NULL,
-    kind text NOT NULL DEFAULT '',
-    origin_id bigint,
-    stream_id bigint NOT NULL,
-    replied_id bigint,
-    at_ids bigint[] NOT NULL DEFAULT '{}',
-    is_primary boolean NOT NULL DEFAULT false,
-    is_recalled boolean NOT NULL DEFAULT false,
-    is_rejected boolean NOT NULL DEFAULT false,
-    is_handled boolean NOT NULL DEFAULT false,
-    is_resolved boolean NOT NULL DEFAULT false,
-    is_internal boolean NOT NULL DEFAULT false,
-    content jsonb NOT NULL DEFAULT '{}'::jsonb,
-    attachments jsonb NOT NULL DEFAULT '[]'::jsonb,
-    extra jsonb,
-    updated_by bigint,
-    updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by bigint,
-    created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- Messages (placeholder for future use)
-CREATE TABLE IF NOT EXISTS public.messages (
-    id bigserial PRIMARY KEY NOT NULL,
-    sender_id bigint NOT NULL,
-    recivier_id bigint NOT NULL,
-    kind character varying(50) NOT NULL DEFAULT '_',
-    content json NOT NULL DEFAULT '{}'::jsonb,
-    updated_by bigint,
-    updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by bigint,
-    created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-
--- User Friends (placeholder for future use)
-CREATE TABLE IF NOT EXISTS public.user_friends (
-    id bigserial PRIMARY KEY NOT NULL,
-    user_id bigint NOT NULL,
-    firend_id bigint NOT NULL,
-    updated_by bigint,
-    updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by bigint,
-    created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

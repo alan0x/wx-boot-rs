@@ -1,11 +1,6 @@
-DROP TABLE IF EXISTS user_friends;
-DROP TABLE IF EXISTS messages;
-DROP TABLE IF EXISTS interflow_threads;
-DROP TABLE IF EXISTS interflow_streams;
 DROP TABLE IF EXISTS user_last_login;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS help_tickets;
-DROP TABLE IF EXISTS labels;
 DROP TABLE IF EXISTS notifications;
 DROP TABLE IF EXISTS security_codes;
 DROP TABLE IF EXISTS access_tokens;
